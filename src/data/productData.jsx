@@ -1,0 +1,97 @@
+/**
+ * Data produk untuk aplikasi, berisi informasi tentang produk termasuk gambar, judul, harga, dan kategori.
+ * Setiap produk memiliki ID unik untuk digunakan sebagai kunci di komponen React.
+ */
+const products = [
+  {
+    id: "1",
+    image: "src/assets/img/makanan 1.jpeg",
+    title: "Salad Segar",
+    price: 39000,
+    category: "Makanan",
+  },
+  {
+    id: "2",
+    image: "src/assets/img/makanan 2.jpeg",
+    title: "Seblak",
+    price: 70000,
+    oldPrice: 85000,
+    discount: 17,
+    category: "Makanan",
+  },
+  {
+    id: "3",
+    image: "src/assets/img/makanan 3.jpeg",
+    title: "Ramen",
+    price: 39000,
+    oldPrice: 55000,
+    discount: 29,
+    category: "Makanan",
+  },
+  {
+    id: "4",
+    image: "src/assets/img/makanan 4.jpeg",
+    title: "Nasi",
+    price: 25000,
+    oldPrice: 30000,
+    discount: 20,
+    category: "Makanan",
+  },
+  {
+    id: "5",
+    image: "src/assets/img/kopi 1.jpeg",
+    title: "Kopi Hitam",
+    price: 29000,
+    category: "Kopi",
+  },
+  {
+    id: "6",
+    image: "src/assets/img/kopi 2.jpeg",
+    title: "Cappuccino",
+    price: 49000,
+    oldPrice: 65000,
+    discount: 20,
+    category: "Kopi",
+  },
+  {
+    id: "7",
+    image: "src/assets/img/kopi 3.jpeg",
+    title: "Kopi Susu",
+    price: 59000,
+    category: "Kopi",
+  },
+  {
+    id: "8",
+    image: "src/assets/img/dessert 1.jpeg",
+    title: "Dessert box",
+    price: 99000,
+    oldPrice: 115000,
+    discount: 17,
+    category: "Desert",
+  },
+  {
+    id: "9",
+    image: "src/assets/img/dessert 2.jpeg",
+    title: "Dessert box",
+    price: 39000,
+    category: "Desert",
+  },
+  {
+    id: "10",
+    image: "src/assets/img/dessert 3.jpeg",
+    title: "Puding",
+    price: 89000,
+    oldPrice: 145000,
+    discount: 14,
+    category: "Desert",
+  },
+  {
+    id: "11",
+    image: "src/assets/img/dessert 4.jpeg",
+    title: "Kue Strawberry",
+    price: 79000,
+    category: "Desert",
+  },
+];
+
+export default products;
