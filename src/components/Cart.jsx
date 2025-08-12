@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../Context/CartContext";
+import { FiMinus, FiPlus } from "react-icons/fi";
+import { MdDelete } from "react-icons/md";
 
 // Objek konstanta untuk teks agar mudah diubah dan dikelola
 const CONTENT = {
@@ -22,35 +24,118 @@ const CONTENT = {
   phoneLabel: "Nomor HP",
   phonePlaceholder: "Masukkan nomor HP Anda",
   backLinkText: "← Kembali ke Menu",
+  itemLabel: "Item",
+  subtotalLabel: "Subtotal",
+  deleteButton: "Hapus",
+};
+
+// Komponen untuk kontrol quantity
+const QuantityControl = ({ quantity, onDecrease, onIncrease, onInputChange, itemId }) => {
+  return (
+    <div className="flex items-center gap-2 mt-2">
+      <button
+        onClick={onDecrease}
+        className="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-full transition duration-200"
+        aria-label="Kurangi jumlah"
+        disabled={quantity <= 1}
+      >
+        <FiMinus size={14} />
+      </button>
+      
+      <input
+        type="number"
+        value={quantity}
+        onChange={(e) => onInputChange(parseInt(e.target.value) || 1)}
+        className="w-16 h-8 text-center border border-gray-300 rounded focus:outline-none focus:border-green-500"
+        min="1"
+        max="99"
+      />
+      
+      <button
+        onClick={onIncrease}
+        className="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-full transition duration-200"
+        aria-label="Tambah jumlah"
+      >
+        <FiPlus size={14} />
+      </button>
+    </div>
+  );
 };
 
 // Komponen untuk menampilkan item keranjang
-const CartItem = ({ item, onRemove }) => (
-  <div className="flex justify-between items-center py-4 border-b">
-    <div className="flex items-center gap-4">
-      <img
-        src={item.image}
-        alt={item.title}
-        className="w-16 h-16 object-cover rounded"
-      />
-      <div>
-        <h4 className="text-lg font-semibold text-gray-800">{item.title}</h4>
-        <p className="text-sm text-gray-600">
-          {CONTENT.quantityLabel}: {item.quantity}
-        </p>
+const CartItem = ({ item, onRemove, onDecrease, onIncrease, onUpdateQuantity }) => (
+  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4">
+    <div className="flex flex-col md:flex-row gap-4">
+      {/* Gambar dan info produk */}
+      <div className="flex gap-4 flex-1">
+        <img
+          src={item.image}
+          alt={item.title}
+          className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+          loading="lazy"
+        />
+        <div className="flex-1">
+          <h4 className="text-lg font-semibold text-gray-800 mb-1">{item.title}</h4>
+          <p className="text-sm text-gray-600 mb-2">
+            {CONTENT.currency} {item.price.toLocaleString("id-ID")} per item
+          </p>
+          
+          {/* Kontrol quantity */}
+          <QuantityControl
+            quantity={item.quantity}
+            onDecrease={() => onDecrease(item.id)}
+            onIncrease={() => onIncrease(item.id)}
+            onInputChange={(newQuantity) => onUpdateQuantity(item.id, newQuantity)}
+            itemId={item.id}
+          />
+        </div>
+      </div>
+      
+      {/* Harga dan tombol hapus */}
+      <div className="flex flex-col items-end justify-between md:min-w-[120px]">
+        <div className="text-right">
+          <p className="text-lg font-bold text-green-600">
+            {CONTENT.currency} {(item.price * item.quantity).toLocaleString("id-ID")}
+          </p>
+          <p className="text-xs text-gray-500">
+            {item.quantity} × {CONTENT.currency} {item.price.toLocaleString("id-ID")}
+          </p>
+        </div>
+        
+        <button
+          onClick={() => onRemove(item.id)}
+          className="flex items-center gap-1 text-red-600 hover:text-red-800 text-sm font-medium mt-2 transition duration-200"
+          aria-label={`${CONTENT.deleteButton} ${item.title} dari keranjang`}
+        >
+          <MdDelete size={16} />
+          {CONTENT.deleteButton}
+        </button>
       </div>
     </div>
-    <div className="text-right">
-      <p className="text-green-600 font-bold">
-        {CONTENT.currency} {(item.price * item.quantity).toLocaleString("id-ID")}
-      </p>
-      <button
-        onClick={() => onRemove(item.id)}
-        className="text-red-600 text-sm hover:underline"
-        aria-label={`Hapus ${item.title} dari keranjang`}
-      >
-        Hapus
-      </button>
+  </div>
+);
+
+// Komponen untuk ringkasan total
+const OrderSummary = ({ cartItems, totalPrice }) => (
+  <div className="bg-green-50 p-6 rounded-lg shadow-sm border border-green-100 mb-6">
+    <h3 className="text-lg font-semibold text-gray-800 mb-4">Ringkasan Pesanan</h3>
+    
+    {cartItems.map((item) => (
+      <div key={item.id} className="flex justify-between items-center py-2 border-b border-green-200 last:border-b-0">
+        <span className="text-gray-600">
+          {item.title} × {item.quantity}
+        </span>
+        <span className="font-medium">
+          {CONTENT.currency} {(item.price * item.quantity).toLocaleString("id-ID")}
+        </span>
+      </div>
+    ))}
+    
+    <div className="flex justify-between items-center pt-4 mt-4 border-t border-green-200">
+      <span className="text-lg font-bold text-gray-800">{CONTENT.totalLabel}:</span>
+      <span className="text-xl font-bold text-green-600">
+        {CONTENT.currency} {totalPrice.toLocaleString("id-ID")}
+      </span>
     </div>
   </div>
 );
@@ -69,14 +154,11 @@ const CheckoutForm = ({ onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 mt-6">
-    {/* Input nama pemesan */}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Input nama pemesan */}
       <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-700"
-        >
-          {CONTENT.nameLabel}
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+          {CONTENT.nameLabel} <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
@@ -84,19 +166,15 @@ const CheckoutForm = ({ onSubmit }) => {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           placeholder={CONTENT.namePlaceholder}
-          aria-label={CONTENT.nameLabel}
         />
       </div>
       
       {/* Input nomor HP */}
       <div>
-        <label
-          htmlFor="phone"
-          className="block text-sm font-medium text-gray-700"
-        >
-          {CONTENT.phoneLabel}
+        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+          {CONTENT.phoneLabel} <span className="text-red-500">*</span>
         </label>
         <input
           type="tel"
@@ -104,39 +182,38 @@ const CheckoutForm = ({ onSubmit }) => {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           required
-          className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           placeholder={CONTENT.phonePlaceholder}
-          aria-label={CONTENT.phoneLabel}
         />
       </div>
 
       {/* Pilihan tipe pesanan */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Tipe Pesanan
+        <label className="block text-sm font-medium text-gray-700 mb-3">
+          Tipe Pesanan <span className="text-red-500">*</span>
         </label>
-        <div className="flex gap-4">
-          <label className="flex items-center gap-2">
+        <div className="flex gap-6">
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
               name="orderType"
               value="takeaway"
               checked={orderType === "takeaway"}
               onChange={() => setOrderType("takeaway")}
-              className="text-green-600 focus:ring-green-600"
+              className="text-green-600 focus:ring-green-500"
             />
-            {CONTENT.takeaway}
+            <span className="text-gray-700">{CONTENT.takeaway}</span>
           </label>
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
               name="orderType"
               value="dinein"
               checked={orderType === "dinein"}
               onChange={() => setOrderType("dinein")}
-              className="text-green-600 focus:ring-green-600"
+              className="text-green-600 focus:ring-green-500"
             />
-            {CONTENT.dineIn}
+            <span className="text-gray-700">{CONTENT.dineIn}</span>
           </label>
         </div>
       </div>
@@ -144,11 +221,8 @@ const CheckoutForm = ({ onSubmit }) => {
       {/* Input nomor meja (hanya untuk dine-in) */}
       {orderType === "dinein" && (
         <div>
-          <label
-            htmlFor="tableNumber"
-            className="block text-sm font-medium text-gray-700"
-          >
-            {CONTENT.tableLabel}
+          <label htmlFor="tableNumber" className="block text-sm font-medium text-gray-700 mb-2">
+            {CONTENT.tableLabel} <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -156,36 +230,30 @@ const CheckoutForm = ({ onSubmit }) => {
             value={tableNumber}
             onChange={(e) => setTableNumber(e.target.value)}
             required={orderType === "dinein"}
-            className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             placeholder={CONTENT.tablePlaceholder}
-            aria-label={CONTENT.tableLabel}
           />
         </div>
       )}
 
       {/* Input catatan */}
       <div>
-        <label
-          htmlFor="notes"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
           {CONTENT.notesLabel}
         </label>
         <textarea
           id="notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          rows="4"
-          className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+          rows="3"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
           placeholder={CONTENT.notesPlaceholder}
-          aria-label={CONTENT.notesLabel}
         />
       </div>
 
       <button
         type="submit"
-        className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg shadow-lg transition duration-300"
-        aria-label={CONTENT.checkoutButton}
+        className="w-full bg-green-600 hover:bg-green-700 text-white py-4 px-6 rounded-lg font-semibold shadow-lg transition duration-300 transform hover:scale-105"
       >
         {CONTENT.checkoutButton}
       </button>
@@ -195,54 +263,109 @@ const CheckoutForm = ({ onSubmit }) => {
 
 // Komponen utama Cart
 const Cart = () => {
-  const { cartItems, removeFromCart, getTotalPrice } = useCart();
+  const { 
+    cartItems, 
+    removeFromCart, 
+    decreaseQuantity, 
+    increaseQuantity, 
+    updateQuantity, 
+    getTotalPrice,
+    clearCart 
+  } = useCart();
 
-  const handleCheckout = ({ orderType, tableNumber, notes }) => {
-    console.log("Checkout:", {
+  const handleCheckout = (orderData) => {
+    const orderDetails = {
+      ...orderData,
       items: cartItems,
-      orderType,
-      tableNumber,
-      notes,
       totalPrice: getTotalPrice(),
-    }); // Ganti dengan panggilan API di produksi
+      orderDate: new Date().toISOString(),
+      orderId: `ORD-${Date.now()}`,
+    };
+    
+    console.log("Checkout Order:", orderDetails);
+    
+    // Simulasi sukses checkout
+    alert("Pesanan berhasil dibuat! Terima kasih telah berbelanja.");
+    clearCart();
   };
 
   return (
-    <section className="bg-gray-50 py-16 px-5 lg:px-14 min-h-screen pt-20">
-      <div className="container mx-auto">
-        {/* Judul utama */}
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-10">
-          {CONTENT.title}
-        </h2>
+    <section className="bg-gray-50 min-h-screen pt-20 pb-16">
+      <div className="container mx-auto px-5 lg:px-14">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">{CONTENT.title}</h1>
+          <p className="text-gray-600">
+            {cartItems.length > 0 
+              ? `${cartItems.length} jenis item dalam keranjang` 
+              : "Keranjang belanja Anda"
+            }
+          </p>
+        </div>
 
-        {/* Daftar item keranjang */}
         {cartItems.length === 0 ? (
-          <p className="text-center text-gray-600">{CONTENT.emptyCart}</p>
-        ) : (
-          <div className="max-w-3xl mx-auto">
-            {cartItems.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onRemove={removeFromCart}
-              />
-            ))}
-            <div className="text-right mt-6">
-              <p className="text-lg font-bold text-gray-800">
-                {CONTENT.totalLabel}: {CONTENT.currency}{" "}
-                {getTotalPrice().toLocaleString("id-ID")}
-              </p>
+          /* Keranjang kosong */
+          <div className="text-center py-16">
+            <div className="mb-8">
+              <svg 
+                className="mx-auto h-24 w-24 text-gray-400" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={1.5} 
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 7M7 13l-1.5 7m0 0h9" 
+                />
+              </svg>
             </div>
-            <CheckoutForm onSubmit={handleCheckout} />
+            <h3 className="text-2xl font-semibold text-gray-800 mb-4">{CONTENT.emptyCart}</h3>
+            <p className="text-gray-600 mb-8">Tambahkan beberapa item ke keranjang Anda untuk melanjutkan.</p>
+            <Link
+              to="/products"
+              className="inline-block bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg font-semibold shadow-lg transition duration-300 transform hover:scale-105"
+            >
+              Mulai Belanja
+            </Link>
+          </div>
+        ) : (
+          /* Konten keranjang */
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Daftar item keranjang */}
+              <div className="lg:col-span-2">
+                <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                  Daftar Item ({cartItems.reduce((total, item) => total + item.quantity, 0)} items)
+                </h2>
+                
+                {cartItems.map((item) => (
+                  <CartItem
+                    key={item.id}
+                    item={item}
+                    onRemove={removeFromCart}
+                    onDecrease={decreaseQuantity}
+                    onIncrease={increaseQuantity}
+                    onUpdateQuantity={updateQuantity}
+                  />
+                ))}
+              </div>
+              
+              {/* Ringkasan dan checkout */}
+              <div className="lg:col-span-1">
+                <OrderSummary cartItems={cartItems} totalPrice={getTotalPrice()} />
+                <CheckoutForm onSubmit={handleCheckout} />
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Tautan kembali */}
-        <div className="text-center mt-15">
+        {/* Link kembali */}
+        <div className="text-center mt-12">
           <Link
             to="/products"
-            className="text-green-600 hover:underline text-sm font-medium"
-            aria-label={CONTENT.backLinkText}
+            className="text-green-600 hover:text-green-800 text-sm font-medium hover:underline transition duration-200"
           >
             {CONTENT.backLinkText}
           </Link>
