@@ -9,6 +9,7 @@ import Testimonial from "./components/Testimonial";
 import Footer from "./components/Footer";
 import Contact from "./components/Contact";
 import Cart from "./components/Cart";
+import ExApi from "./components/exApi"; 
 
 // Konfigurasi rute untuk memudahkan pemeliharaan
 const routes = [
@@ -55,6 +56,14 @@ const routes = [
     path: "/cart",
     components: [
       { Component: Cart, key: "cart", props: {} },
+      { Component: Footer, key: "footer", props: {} },
+    ],
+  },
+  {
+    path: "/exApi",
+    components: [
+      { Component: ExApi, key: "exApi", props: {} },
+      { Component: Products, key: "products", props: {} },
       { Component: Footer, key: "footer", props: {} },
     ],
   },

@@ -9,34 +9,37 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
   // Fungsi untuk menambah item ke keranjang
-  const addToCart = (product, quantity = 1) => {
+  const addToCart = (product) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id);
       if (existingItem) {
         return prevItems.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
-      return [...prevItems, { ...product, quantity }];
+      return [...prevItems, { ...product, quantity: 1 }];
     });
   };
 
-  // Fungsi untuk mengurangi quantity item
+  // Fungsi untuk menghapus item dari keranjang
+  const removeFromCart = (id) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  };
+
+  // Fungsi untuk mengurangi jumlah item
   const decreaseQuantity = (id) => {
     setCartItems((prevItems) =>
-      prevItems
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: Math.max(1, item.quantity - 1) }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
+      prevItems.map((item) =>
+        item.id === id && item.quantity > 1
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      )
     );
   };
 
-  // Fungsi untuk menambah quantity item
+  // Fungsi untuk menambah jumlah item
   const increaseQuantity = (id) => {
     setCartItems((prevItems) =>
       prevItems.map((item) =>
@@ -45,22 +48,15 @@ export const CartProvider = ({ children }) => {
     );
   };
 
-  // Fungsi untuk mengupdate quantity secara langsung
+  // Fungsi untuk memperbarui jumlah item secara langsung
   const updateQuantity = (id, newQuantity) => {
-    if (newQuantity <= 0) {
-      removeFromCart(id);
-      return;
+    if (newQuantity >= 1) {
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === id ? { ...item, quantity: newQuantity } : item
+        )
+      );
     }
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
-
-  // Fungsi untuk menghapus item dari keranjang
-  const removeFromCart = (id) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
   // Fungsi untuk menghitung total item di keranjang
@@ -76,7 +72,7 @@ export const CartProvider = ({ children }) => {
     );
   };
 
-  // Fungsi untuk membersihkan keranjang
+  // Fungsi untuk mengosongkan keranjang
   const clearCart = () => {
     setCartItems([]);
   };
@@ -101,10 +97,4 @@ export const CartProvider = ({ children }) => {
 };
 
 // Hook untuk menggunakan context keranjang
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
-  return context;
-};
+export const useCart = () => useContext(CartContext);

@@ -16,6 +16,7 @@ const CONTENT = {
     { name: "Tentang Kami", path: "/about" },
     { name: "Kontak", path: "/contact" },
     { name: "Testimoni", path: "/testimonial" },
+    { name: "exApi", path: "/exApi" }
   ],
   icons: [
     { Icon: FiSearch, ariaLabel: "Pencarian" },

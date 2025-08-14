@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../Context/CartContext";
-import { FiMinus, FiPlus } from "react-icons/fi";
+import PlusMinus from "./plusminus";
 import { MdDelete } from "react-icons/md";
 
 // Objek konstanta untuk teks agar mudah diubah dan dikelola
@@ -29,41 +29,8 @@ const CONTENT = {
   deleteButton: "Hapus",
 };
 
-// Komponen untuk kontrol quantity
-const QuantityControl = ({ quantity, onDecrease, onIncrease, onInputChange, itemId }) => {
-  return (
-    <div className="flex items-center gap-2 mt-2">
-      <button
-        onClick={onDecrease}
-        className="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-full transition duration-200"
-        aria-label="Kurangi jumlah"
-        disabled={quantity <= 1}
-      >
-        <FiMinus size={14} />
-      </button>
-      
-      <input
-        type="number"
-        value={quantity}
-        onChange={(e) => onInputChange(parseInt(e.target.value) || 1)}
-        className="w-16 h-8 text-center border border-gray-300 rounded focus:outline-none focus:border-green-500"
-        min="1"
-        max="99"
-      />
-      
-      <button
-        onClick={onIncrease}
-        className="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-full transition duration-200"
-        aria-label="Tambah jumlah"
-      >
-        <FiPlus size={14} />
-      </button>
-    </div>
-  );
-};
-
 // Komponen untuk menampilkan item keranjang
-const CartItem = ({ item, onRemove, onDecrease, onIncrease, onUpdateQuantity }) => (
+const CartItem = ({ item, onRemove, onDecrease, onIncrease }) => (
   <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4">
     <div className="flex flex-col md:flex-row gap-4">
       {/* Gambar dan info produk */}
@@ -80,13 +47,15 @@ const CartItem = ({ item, onRemove, onDecrease, onIncrease, onUpdateQuantity }) 
             {CONTENT.currency} {item.price.toLocaleString("id-ID")} per item
           </p>
           
-          {/* Kontrol quantity */}
-          <QuantityControl
-            quantity={item.quantity}
-            onDecrease={() => onDecrease(item.id)}
-            onIncrease={() => onIncrease(item.id)}
-            onInputChange={(newQuantity) => onUpdateQuantity(item.id, newQuantity)}
-            itemId={item.id}
+          {/* Kontrol quantity menggunakan PlusMinus */}
+          <PlusMinus
+            data={item.quantity}
+            setData={(id, newQuantity) => {
+              if (newQuantity > item.quantity) onIncrease(id);
+              else if (newQuantity < item.quantity) onDecrease(id);
+            }}
+            id={item.id}
+            max="10" // Batas maksimum kuantitas
           />
         </div>
       </div>
@@ -268,7 +237,6 @@ const Cart = () => {
     removeFromCart, 
     decreaseQuantity, 
     increaseQuantity, 
-    updateQuantity, 
     getTotalPrice,
     clearCart 
   } = useCart();
@@ -347,7 +315,6 @@ const Cart = () => {
                     onRemove={removeFromCart}
                     onDecrease={decreaseQuantity}
                     onIncrease={increaseQuantity}
-                    onUpdateQuantity={updateQuantity}
                   />
                 ))}
               </div>
