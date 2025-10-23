@@ -9,8 +9,6 @@ const products = [
     title: "Salad Segar",
     price: 39000,
     category: "Makanan",
-    stock: 15,
-    maxPurchase: 5,
   },
   {
     id: "2",
@@ -20,8 +18,6 @@ const products = [
     oldPrice: 85000,
     discount: 17,
     category: "Makanan",
-    stock: 8,
-    maxPurchase: 3,
   },
   {
     id: "3",
@@ -31,8 +27,6 @@ const products = [
     oldPrice: 55000,
     discount: 29,
     category: "Makanan",
-    stock: 12,
-    maxPurchase: 4,
   },
   {
     id: "4",
@@ -42,8 +36,6 @@ const products = [
     oldPrice: 30000,
     discount: 20,
     category: "Makanan",
-    stock: 20,
-    maxPurchase: 10,
   },
   {
     id: "12",
@@ -53,8 +45,6 @@ const products = [
     oldPrice: 30000,
     discount: 20,
     category: "Makanan",
-    stock: 6,
-    maxPurchase: 3,
   },
   {
     id: "5",
@@ -62,8 +52,6 @@ const products = [
     title: "Kopi Hitam",
     price: 29000,
     category: "Kopi",
-    stock: 25,
-    maxPurchase: 8,
   },
   {
     id: "6",
@@ -73,8 +61,6 @@ const products = [
     oldPrice: 65000,
     discount: 20,
     category: "Kopi",
-    stock: 10,
-    maxPurchase: 5,
   },
   {
     id: "7",
@@ -82,8 +68,6 @@ const products = [
     title: "Kopi Susu",
     price: 59000,
     category: "Kopi",
-    stock: 18,
-    maxPurchase: 6,
   },
   {
     id: "8",
@@ -93,8 +77,6 @@ const products = [
     oldPrice: 115000,
     discount: 17,
     category: "Desert",
-    stock: 5,
-    maxPurchase: 2,
   },
   {
     id: "9",
@@ -102,8 +84,6 @@ const products = [
     title: "Dessert box",
     price: 39000,
     category: "Desert",
-    stock: 12,
-    maxPurchase: 4,
   },
   {
     id: "10",
@@ -114,8 +94,6 @@ const products = [
     status: "soldout",
     discount: 14,
     category: "Desert",
-    stock: 0,
-    maxPurchase: 3,
   },
   {
     id: "11",
@@ -123,8 +101,6 @@ const products = [
     title: "Kue Strawberry",
     price: 79000,
     category: "Desert",
-    stock: 7,
-    maxPurchase: 2,
   },
 ];
 
